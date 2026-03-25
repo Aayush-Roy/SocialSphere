@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node build/index",
-    "build": "tsc -p .",
-    "dev": "tsc-watch --onSuccess \"npm run build && npm start\""
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node build/index.js"
   },
   "keywords": [],
   "author": "",
@@ -14,14 +14,23 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/pg": "^8.20.0",
+    "prisma": "^7.5.0",
     "tsc-watch": "^7.2.0",
     "typescript": "^6.0.2"
   },
   "dependencies": {
     "@apollo/server": "^5.5.0",
     "@as-integrations/express5": "^1.1.2",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "body-parser": "^2.2.2",
     "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "graphql": "^16.13.2"
+    "graphql": "^16.13.2",
+    "nodemon": "^3.1.14",
+    "pg": "^8.20.0",
+    "ts-node": "^10.9.2"
   }
 }

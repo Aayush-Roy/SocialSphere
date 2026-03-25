@@ -2,10 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express5';
-
+import bodyParser from "body-parser";
+import { prisma } from '../prismaClient/index';
 export async function initServer(): Promise<express.Express> {
     const app = express();
-
+    app.use(bodyParser.json())
     const graphqlServer = new ApolloServer({
         typeDefs: `
             type Query{
@@ -18,6 +19,8 @@ export async function initServer(): Promise<express.Express> {
             }
         },
     });
+
+    prisma
 
     await graphqlServer.start();
 
