@@ -3,7 +3,8 @@ import cors from 'cors';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express5';
 import bodyParser from "body-parser";
-import { prisma } from '../prismaClient/index';
+import { prisma } from '../prismaClient';
+
 export async function initServer(): Promise<express.Express> {
     const app = express();
     app.use(bodyParser.json())
@@ -20,8 +21,8 @@ export async function initServer(): Promise<express.Express> {
         },
     });
 
-    prisma
-
+    
+    
     await graphqlServer.start();
 
     app.use(cors());

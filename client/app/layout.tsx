@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import "./globals.css";
 import { Inter } from 'next/font/google'
 const geistSans = Geist({
@@ -27,7 +28,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable}   ${geistMono.variable} h-full antialiased`}
     >
+      {/* 598712780231-hs2ekjg5672jjgm2l76i5s49mcplhfnj.apps.googleusercontent.com */}
+      {/* 598712780231-hs2ekjg5672jjgm2l76i5s49mcplhfnj.apps.googleusercontent.com */}
+      <GoogleOAuthProvider clientId="598712780231-hs2ekjg5672jjgm2l76i5s49mcplhfnj.apps.googleusercontent.com">
       <body className="min-h-full flex flex-col">{children}</body>
+      </GoogleOAuthProvider>
     </html>
   );
 }

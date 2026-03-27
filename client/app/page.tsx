@@ -33,6 +33,7 @@ import {
   AiOutlineUser,
   AiOutlineMore,
 } from "react-icons/ai";
+import { GoogleLogin } from "@react-oauth/google";
 import { BsBookmark, BsPeople, BsTwitterX } from "react-icons/bs";
 import { RiQuillPenLine, RiMoneyDollarCircleLine } from "react-icons/ri";
 import { MdOutlineVerified } from "react-icons/md";
@@ -203,6 +204,7 @@ export default function Home() {
         <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-800">
           <AiOutlineSearch className="text-gray-500 text-lg" />
           <span className="text-gray-500 text-sm">Search</span>
+          <GoogleLogin onSuccess={(cred)=>{console.log(cred)} } />
         </div>
       </div>
     </div>
