@@ -24,7 +24,7 @@
 //   );
 // }
 'use client'
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   AiOutlineHome,
   AiOutlineSearch,
@@ -64,6 +64,7 @@ const sidebarItems: SidebarItem[] = [
 
 function SidebarButton({ item }: { item: SidebarItem }) {
   const [hovered, setHovered] = useState(false);
+
 
   return (
     <button
@@ -180,6 +181,7 @@ export function TwitterSidebar() {
 
 // Full page layout demo
 export default function Home() {
+  const handleLoginWithGoogle = useCallback((cred:CredentialResponse)=>{},[])
   return (
     <div
       className="grid grid-cols-12 h-screen w-screen"
