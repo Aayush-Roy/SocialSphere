@@ -1,28 +1,4 @@
-// import Image from "next/image";
-// import React from "react";
 
-
-// interface SocialSidebarButton {
-//   title:string;
-//   icon:React.ReactNode
-// }
-
-// const SidebarMenuItems:SocialSidebarButton[]=[
-//   {
-//     title:"Home",
-//     icon:
-//   }
-// ]
-
-// export default function Home() {
-//   return (
-//    <div className="grid grid-cols-12 h-screen w-screen">
-//     <div className="col-span-3 "></div>
-//     <div className="col-span-6 border-r-2 border-r-slate-800 border-l-2 border-l-slate-800"></div>
-//     <div className="col-span-3 "></div>
-//    </div>
-//   );
-// }
 'use client'
 import React, { useCallback, useState } from "react";
 import {
@@ -40,6 +16,11 @@ import { MdOutlineVerified } from "react-icons/md";
 import { SlOptions } from "react-icons/sl";
 import Image from "next/image";
 import FeedCardDemo, { FeedCard } from "@/components/FeedCard/page";
+import toast from "react-hot-toast";
+import { graphql } from "@/src/gql";
+import { GraphQLClient } from "graphql-request";
+import { graphqClient } from "@/gqlClients/api";
+import {  verifyGoogleToken } from "@/graphql/query/user";
 
 interface SidebarItem {
   title: string;
@@ -181,7 +162,14 @@ export function TwitterSidebar() {
 
 // Full page layout demo
 export default function Home() {
-  const handleLoginWithGoogle = useCallback((cred:CredentialResponse)=>{},[])
+  const handleLoginWithGoogle = useCallback(async(cred:CredentialResponse)=>{
+    const googleToken = cred.credential
+    if(!googleToken) return toast.error(`Google token not found`)
+    const res = await graphqClient.request(verifyGoogleToken ,{token:googleToken})
+    toast.success(`Verified Successful`)
+    console.log(res)
+    if(verifyGoogleToken) window.localStorage.setItem('token',res.verifyGoogleToken);
+  },[])
   return (
     <div
       className="grid grid-cols-12 h-screen w-screen"
@@ -206,7 +194,7 @@ export default function Home() {
         <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-800">
           <AiOutlineSearch className="text-gray-500 text-lg" />
           <span className="text-gray-500 text-sm">Search</span>
-          <GoogleLogin onSuccess={(cred)=>{console.log(cred)} } />
+          <GoogleLogin onSuccess={handleLoginWithGoogle}/>
         </div>
       </div>
     </div>
