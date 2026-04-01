@@ -53,6 +53,10 @@ const queries = {
         console.log(ctx)
         const id = ctx.user?.id;
         if(!id) return null;
+        const user = await prisma.user.findUnique({where:{
+            id:id
+        }})
+        return user;
     }
 }
 

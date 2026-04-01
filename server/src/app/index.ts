@@ -34,7 +34,7 @@ export async function initServer(): Promise<express.Express> {
     app.use(express.json());
 
     app.use("/graphql", expressMiddleware(graphqlServer,{context:async({req,res})=>{
-        return {user:req.headers.authorization ? JWTService.decodeToken(req.headers.authorization) : undefined}
+        return {user:req.headers.authorization ? JWTService.decodeToken(req.headers.authorization.split('Bearer ')[1]) : undefined}
     }}));
 
     return app;

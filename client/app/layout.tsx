@@ -38,13 +38,19 @@
 //     </html>
 //   );
 // }
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { Inter } from "next/font/google";
-
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import Providers from "./provider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -56,6 +62,7 @@ const geistMono = Geist_Mono({
 });
 
 const inter = Inter({ subsets: ["latin"] });
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -73,15 +80,19 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/* <QueryClientProvider client={queryClient}>
 
         <GoogleOAuthProvider clientId="598712780231-hs2ekjg5672jjgm2l76i5s49mcplhfnj.apps.googleusercontent.com">
 
           {children}
 
           <Toaster position="top-right" />
-
+          <ReactQueryDevtools />
         </GoogleOAuthProvider>
-
+</QueryClientProvider> */}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

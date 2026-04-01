@@ -19,9 +19,10 @@ import FeedCardDemo, { FeedCard } from "@/components/FeedCard/page";
 import toast from "react-hot-toast";
 import { graphql } from "@/src/gql";
 import { GraphQLClient } from "graphql-request";
-import { graphqClient } from "@/gqlClients/api";
+import { graphqlClient } from "@/gqlClients/api";
 import {  verifyGoogleToken } from "@/graphql/query/user";
-
+import { useCurrentUser } from "@/hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
 interface SidebarItem {
   title: string;
   icon: React.ReactNode;
@@ -162,14 +163,65 @@ export function TwitterSidebar() {
 
 // Full page layout demo
 export default function Home() {
-  const handleLoginWithGoogle = useCallback(async(cred:CredentialResponse)=>{
-    const googleToken = cred.credential
-    if(!googleToken) return toast.error(`Google token not found`)
-    const res = await graphqClient.request(verifyGoogleToken ,{token:googleToken})
-    toast.success(`Verified Successful`)
-    console.log(res)
-    if(verifyGoogleToken) window.localStorage.setItem('token',res.verifyGoogleToken);
-  },[])
+  const user = useCurrentUser();
+
+  console.log("currUser->",user);
+  // const handleLoginWithGoogle = useCallback(async(cred:CredentialResponse)=>{
+  //   const googleToken = cred.credential
+  //   if(!googleToken) return toast.error(`Google token not found`)
+  //   const res = await graphqClient.request(verifyGoogleToken ,{token:googleToken})
+  //   toast.success(`Verified Successful`)
+  //   console.log(res)
+  //   if(verifyGoogleToken) window.localStorage.setItem('token',res.verifyGoogleToken);
+  // },[])
+  const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
+  const googleToken = cred.credential;
+
+  if (!googleToken) {
+    toast.error("Google token not found");
+    return;
+  }
+
+  const res = await graphqlClient.request(verifyGoogleToken, {
+    token: googleToken,
+  });
+
+  console.log("token from backend ->", res.verifyGoogleToken);
+
+  if (res.verifyGoogleToken) {
+    window.localStorage.setItem("token", res.verifyGoogleToken);
+    toast.success("Login successful");
+
+    // optional refresh so hook runs again
+    window.location.reload();
+  }
+}, []);
+      
+
+
+
+// const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
+//   const googleToken = cred.credential;
+
+//   if (!googleToken) {
+//     toast.error("Google token not found");
+//     return;
+//   }
+
+//   const res = await graphqClient.request(verifyGoogleToken, {
+//     token: googleToken,
+//   });
+
+//   if (res.verifyGoogleToken) {
+//     localStorage.setItem("token", res.verifyGoogleToken);
+//       console.log("token ->", localStorage.getItem("token"));
+//     toast.success("Login successful");
+//     // refetch current user
+//     queryClient.invalidateQueries({
+//       queryKey: ["current-user"],
+//     });
+//   }
+// }, [queryClient]);
   return (
     <div
       className="grid grid-cols-12 h-screen w-screen"

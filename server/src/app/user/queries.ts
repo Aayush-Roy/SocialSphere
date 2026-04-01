@@ -4,3 +4,15 @@ export const queries=`#graphql
     getCurrentUser:User
 
 `
+
+export const getCurrentUserQuery = `#graphql
+
+    getCurrentUser {
+    id
+    profileImageUrl
+    email
+    firstName
+    lastName
+  }
+
+`
