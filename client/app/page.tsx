@@ -1,4 +1,3 @@
-
 'use client'
 import React, { useCallback, useState } from "react";
 import {
@@ -82,6 +81,7 @@ function SidebarButton({ item }: { item: SidebarItem }) {
 }
 
 export function TwitterSidebar() {
+  const { user, isLoading } = useCurrentUser();
   return (
     <div
       className="flex flex-col h-screen sticky top-0 items-center xl:items-start px-2 xl:px-4 py-2 justify-between"
@@ -140,6 +140,7 @@ export function TwitterSidebar() {
         onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
       >
         {/* Avatar */}
+    
         <div className="w-10 h-10 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
           <div className="w-full h-full bg-gradient-to-br from-gray-500 to-gray-700 flex items-center justify-center">
             <AiOutlineUser className="text-white text-xl" />
@@ -147,15 +148,26 @@ export function TwitterSidebar() {
         </div>
 
         {/* Name & Handle */}
+       
         <div className="hidden xl:flex flex-col flex-1 min-w-0">
           <span className="text-white font-bold text-sm truncate" style={{ fontFamily: "'Chirp', sans-serif" }}>
             Your Name
           </span>
-          <span className="text-gray-500 text-sm truncate">@yourhandle</span>
+          <span className="text-gray-500 text-sm truncate">@{user?.firstName}</span>
         </div>
 
         {/* Three dots */}
-        <SlOptions className="hidden xl:block text-white text-sm flex-shrink-0" />
+        {/* <SlOptions className="hidden xl:block text-white text-sm flex-shrink-0" /> */}
+        {user && <Image
+  src={user?.
+profileImageUrl
+}
+  alt="user"
+  width={40}
+  height={40}
+  className="rounded-full"
+/>}
+        
       </div>
     </div>
   );
@@ -163,8 +175,9 @@ export function TwitterSidebar() {
 
 // Full page layout demo
 export default function Home() {
-  const user = useCurrentUser();
-
+  // const user = useCurrentUser();
+  const { user, isLoading } = useCurrentUser();
+  const queryClient = useQueryClient();
   console.log("currUser->",user);
   // const handleLoginWithGoogle = useCallback(async(cred:CredentialResponse)=>{
   //   const googleToken = cred.credential
@@ -188,14 +201,26 @@ export default function Home() {
 
   console.log("token from backend ->", res.verifyGoogleToken);
 
-  if (res.verifyGoogleToken) {
-    window.localStorage.setItem("token", res.verifyGoogleToken);
+  // if (res.verifyGoogleToken) {
+  //   window.localStorage.setItem("token", res.verifyGoogleToken);
+  //   toast.success("Login successful");
+
+  //   // optional refresh so hook runs again
+  //   window.location.reload();
+    
+  // }
+    if (res.verifyGoogleToken) {
+    localStorage.setItem("token", res.verifyGoogleToken);
+
     toast.success("Login successful");
 
-    // optional refresh so hook runs again
-    window.location.reload();
+    // 👇 important
+    await queryClient.invalidateQueries({
+      queryKey: ["getCurrentUser"],
+    });
   }
-}, []);
+  
+}, [queryClient]);
       
 
 
@@ -246,7 +271,8 @@ export default function Home() {
         <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-800">
           <AiOutlineSearch className="text-gray-500 text-lg" />
           <span className="text-gray-500 text-sm">Search</span>
-          <GoogleLogin onSuccess={handleLoginWithGoogle}/>
+          {!user && <GoogleLogin onSuccess={handleLoginWithGoogle}/>}
+          
         </div>
       </div>
     </div>
