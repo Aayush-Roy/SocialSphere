@@ -6,11 +6,18 @@ interface CreateTweetPayLoad{
     content:string;
     imageUrl?:string;
 }
+// const queries = {
+//     getAllTweets:()=>{
+//         prisma.tweet.findMany({orderBy:{createdAt:"desc"}})
+//     }
+// }
 const queries = {
-    getAllTweets:()=>{
-        prisma.tweet.findMany({orderBy:{createdAt:"desc"}})
+    getAllTweets: async () => {
+        return await prisma.tweet.findMany({
+            orderBy: { createdAt: "desc" }
+        });
     }
-}
+};
 const mutations ={
     createTweet:async(parent:any,{payload}:{payload:CreateTweetPayLoad},ctx:GraphqlContext)=>{
         if(!ctx.user) throw new Error("you are not authenticated")

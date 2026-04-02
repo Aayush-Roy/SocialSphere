@@ -1,5 +1,6 @@
 "use client";
 
+import { Tweet } from "@/src/gql/graphql";
 import React, { useState } from "react";
 import {
   AiOutlineHeart,
@@ -15,23 +16,25 @@ import { RiUserFollowLine } from "react-icons/ri";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+// export interface FeedCardProps {
+//   avatar?: string;           // URL or undefined → shows initials
+//   name: string;
+//   handle: string;
+//   verified?: boolean;
+//   timeAgo: string;
+//   content: string;
+//   image?: string;            // optional tweet image
+//   replyTo?: string;          // e.g. "replying to @someone"
+//   stats: {
+//     replies: number;
+//     retweets: number;
+//     likes: number;
+//     views: number;
+//   };
+// }
 export interface FeedCardProps {
-  avatar?: string;           // URL or undefined → shows initials
-  name: string;
-  handle: string;
-  verified?: boolean;
-  timeAgo: string;
-  content: string;
-  image?: string;            // optional tweet image
-  replyTo?: string;          // e.g. "replying to @someone"
-  stats: {
-    replies: number;
-    retweets: number;
-    likes: number;
-    views: number;
-  };
+  data:Tweet
 }
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatCount(n: number): string {
@@ -101,17 +104,10 @@ function ActionBtn({ icon, activeIcon, count, activeColor, hoverBg, label }: Act
 
 // ─── Feed Card ────────────────────────────────────────────────────────────────
 
-export function FeedCard({
-  avatar,
-  name,
-  handle,
-  verified = false,
-  timeAgo,
-  content,
-  image,
-  replyTo,
-  stats,
-}: FeedCardProps) {
+export function FeedCard(props: FeedCardProps) {
+
+  const {data} = props;
+  console.log("feed->",data);
   const [bookmarked, setBookmarked] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -191,11 +187,12 @@ export function FeedCard({
               @{replyTo}
             </span>
           </p>
+
         )}
 
         {/* Tweet text */}
         <p className="text-white text-[15px] leading-relaxed mt-0.5 whitespace-pre-wrap break-words">
-          {content}
+          {data.content}
         </p>
 
         {/* Optional image */}
@@ -313,7 +310,9 @@ const DEMO_TWEETS: FeedCardProps[] = [
   },
 ];
 
-export default function FeedCardDemo() {
+export default function FeedCardDemo(props: FeedCardProps) {
+  const {data} = props;
+  console.log("data", props)
   return (
     <div className="min-h-screen bg-black ">
       <div className="max-w-[800px] mx-auto border-x border-gray-800 min-h-screen">
@@ -326,7 +325,7 @@ export default function FeedCardDemo() {
         </div>
 
         {/* Cards */}
-        {DEMO_TWEETS.map((tweet, i) => (
+        {data?.map((tweet, i) => (
           <FeedCard key={i} {...tweet} />
         ))}
       </div>

@@ -23,6 +23,7 @@ import {  verifyGoogleToken } from "@/graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import CreatePostCard from "@/components/CreatePostCard";
+import { useGetAllTweets } from "@/hooks/tweet";
 interface SidebarItem {
   title: string;
   icon: React.ReactNode;
@@ -179,6 +180,8 @@ export default function Home() {
   // const user = useCurrentUser();
   const { user, isLoading } = useCurrentUser();
   const queryClient = useQueryClient();
+  const {tweets=[]} = useGetAllTweets();
+  console.log("tweets->", tweets);
   console.log("currUser->",user);
   // const handleLoginWithGoogle = useCallback(async(cred:CredentialResponse)=>{
   //   const googleToken = cred.credential
@@ -271,7 +274,8 @@ profileImageUrl
           />
         )}
         {/* Placeholder tweets */}
-        <FeedCardDemo/>
+        {/* {tweets?.map(tweet=><FeedCardDemo key={tweet?.id} data={tweet} />)} */}
+        <FeedCardDemo />
       </div>
 
       {/* Right Panel */}
