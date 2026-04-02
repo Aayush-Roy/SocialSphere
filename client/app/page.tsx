@@ -22,6 +22,7 @@ import { graphqlClient } from "@/gqlClients/api";
 import {  verifyGoogleToken } from "@/graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
+import CreatePostCard from "@/components/CreatePostCard";
 interface SidebarItem {
   title: string;
   icon: React.ReactNode;
@@ -260,7 +261,15 @@ export default function Home() {
       {/* Main Feed */}
       <div className="col-span-6 border-r border-gray-800 h-screen overflow-y-auto">
         {/* Header */}
-       
+       {user && (
+          <CreatePostCard
+            userAvatar={user?.
+profileImageUrl
+}
+            userName={user?.firstName}
+            // onPostCreate={handleCreatePost}
+          />
+        )}
         {/* Placeholder tweets */}
         <FeedCardDemo/>
       </div>

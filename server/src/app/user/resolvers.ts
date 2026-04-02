@@ -2,6 +2,7 @@ import axios from "axios"
 import { prisma } from "../../prismaClient";
 import JWTService from "../services/jwt";
 import { GraphqlContext } from "../../interfaces";
+import { Tweet, User } from "@prisma/client";
  interface GoogleTokenInfo {
   iss?: string;
   azp?: string;
@@ -60,4 +61,12 @@ const queries = {
     }
 }
 
-export const resolvers = {queries}
+const extraResolvers = {
+
+    User:{
+        tweets:(parent:User)=>prisma.tweet.findMany({where:{author:{id:parent.id}}})
+    }
+
+}
+
+export const resolvers = {queries,extraResolvers}
