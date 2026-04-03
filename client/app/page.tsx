@@ -35,12 +35,10 @@ const sidebarItems: SidebarItem[] = [
   { title: "Home", icon: <AiOutlineHome />, active: true },
   { title: "Explore", icon: <AiOutlineSearch /> },
   { title: "Notifications", icon: <AiOutlineBell />, badge: 3 },
-  // { title: "Messages", icon: <AiOutlineMail /> },
+
   { title: "Grok", icon: <RiQuillPenLine /> },
   { title: "Bookmarks", icon: <BsBookmark /> },
-  // { title: "Communities", icon: <BsPeople /> },
-  // { title: "Premium", icon: <MdOutlineVerified /> },
-  // { title: "Monetization", icon: <RiMoneyDollarCircleLine /> },
+
   { title: "Profile", icon: <AiOutlineUser /> },
   { title: "More", icon: <AiOutlineMore /> },
 ];
@@ -183,14 +181,7 @@ export default function Home() {
   const {tweets=[]} = useGetAllTweets();
   console.log("tweets->", tweets);
   console.log("currUser->",user);
-  // const handleLoginWithGoogle = useCallback(async(cred:CredentialResponse)=>{
-  //   const googleToken = cred.credential
-  //   if(!googleToken) return toast.error(`Google token not found`)
-  //   const res = await graphqClient.request(verifyGoogleToken ,{token:googleToken})
-  //   toast.success(`Verified Successful`)
-  //   console.log(res)
-  //   if(verifyGoogleToken) window.localStorage.setItem('token',res.verifyGoogleToken);
-  // },[])
+
   const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
   const googleToken = cred.credential;
 
@@ -205,14 +196,7 @@ export default function Home() {
 
   console.log("token from backend ->", res.verifyGoogleToken);
 
-  // if (res.verifyGoogleToken) {
-  //   window.localStorage.setItem("token", res.verifyGoogleToken);
-  //   toast.success("Login successful");
 
-  //   // optional refresh so hook runs again
-  //   window.location.reload();
-    
-  // }
     if (res.verifyGoogleToken) {
     localStorage.setItem("token", res.verifyGoogleToken);
 
@@ -229,28 +213,7 @@ export default function Home() {
 
 
 
-// const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
-//   const googleToken = cred.credential;
 
-//   if (!googleToken) {
-//     toast.error("Google token not found");
-//     return;
-//   }
-
-//   const res = await graphqClient.request(verifyGoogleToken, {
-//     token: googleToken,
-//   });
-
-//   if (res.verifyGoogleToken) {
-//     localStorage.setItem("token", res.verifyGoogleToken);
-//       console.log("token ->", localStorage.getItem("token"));
-//     toast.success("Login successful");
-//     // refetch current user
-//     queryClient.invalidateQueries({
-//       queryKey: ["current-user"],
-//     });
-//   }
-// }, [queryClient]);
   return (
     <div
       className="grid grid-cols-12 h-screen w-screen"
@@ -273,9 +236,7 @@ profileImageUrl
             // onPostCreate={handleCreatePost}
           />
         )}
-        {/* Placeholder tweets */}
-        {/* {tweets?.map(tweet=><FeedCardDemo key={tweet?.id} data={tweet} />)} */}
-        {/* <FeedCardDemo data={tweets} /> */}
+      
         {tweets?.map((tweet)=>(
     <FeedCard key={tweet.id} data={tweet}/>
   ))}
