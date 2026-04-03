@@ -24,11 +24,13 @@ import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import CreatePostCard from "@/components/CreatePostCard";
 import { useGetAllTweets } from "@/hooks/tweet";
+import Link from "next/link";
 interface SidebarItem {
   title: string;
   icon: React.ReactNode;
   active?: boolean;
   badge?: number;
+  link?:string;
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -39,7 +41,7 @@ const sidebarItems: SidebarItem[] = [
   { title: "Grok", icon: <RiQuillPenLine /> },
   { title: "Bookmarks", icon: <BsBookmark /> },
 
-  { title: "Profile", icon: <AiOutlineUser /> },
+  { title: "Profile", icon: <AiOutlineUser />},
   { title: "More", icon: <AiOutlineMore /> },
 ];
 
@@ -133,6 +135,7 @@ export function TwitterSidebar() {
       </div>
 
       {/* Bottom: User Profile */}
+      <Link href={`/profile/${user?.id}`}>
       <div
         className="flex items-center gap-3 p-3 rounded-full cursor-pointer w-full transition-all"
         style={{ background: "transparent" }}
@@ -169,6 +172,7 @@ profileImageUrl
 />}
         
       </div>
+      </Link>
     </div>
   );
 }

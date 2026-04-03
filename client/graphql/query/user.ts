@@ -49,6 +49,10 @@ export const getCurrentUserQuery = `
       email
       firstName
       lastName
+      tweets{
+        id
+        content
+      }
     }
   }
 `;
