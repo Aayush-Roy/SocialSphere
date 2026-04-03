@@ -104,9 +104,7 @@ function ActionBtn({ icon, activeIcon, count, activeColor, hoverBg, label }: Act
 
 // ─── Feed Card ────────────────────────────────────────────────────────────────
 
-export function FeedCard(props: FeedCardProps) {
-
-  const {data} = props;
+export function FeedCard({data}: FeedCardProps) {
   console.log("feed->",data);
   const [bookmarked, setBookmarked] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -119,11 +117,12 @@ export function FeedCard(props: FeedCardProps) {
       {/* ── Avatar ── */}
       <div className="flex-shrink-0 mt-0.5">
         <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-[#1d9bf0]/40 transition-all">
-          {avatar ? (
-            <img src={avatar} alt={name} className="w-full h-full object-cover" />
-          ) : (
-            <Initials name={name} />
-          )}
+         
+           <img
+        src={data.author?.profileImageUrl}
+         referrerPolicy="no-referrer"
+        className="w-10 h-10 rounded-full"
+      />
         </div>
       </div>
 
@@ -134,16 +133,16 @@ export function FeedCard(props: FeedCardProps) {
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-1 flex-wrap min-w-0">
             <span className="text-white font-bold text-[15px] truncate hover:underline">
-              {name}
+              {data.author?.firstName}
             </span>
-            {verified && (
+            {/* {verified && (
               <MdOutlineVerified className="text-[#1d9bf0] text-base flex-shrink-0" />
-            )}
+            )} */}
             <span className="text-gray-500 text-[14px] truncate">
-              @{handle}
+              @{data.author?.firstName.toLocaleLowerCase()}
             </span>
             <span className="text-gray-500 text-[14px]">·</span>
-            <span className="text-gray-500 text-[14px] flex-shrink-0">{timeAgo}</span>
+            {/* <span className="text-gray-500 text-[14px] flex-shrink-0">{timeAgo}</span> */}
           </div>
 
           {/* Three-dot menu */}
@@ -161,7 +160,7 @@ export function FeedCard(props: FeedCardProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 {[
-                  { icon: <RiUserFollowLine />, label: `Follow @${handle}` },
+                  { icon: <RiUserFollowLine />, label: `Follow @${data.author?.firstName.toLowerCase()}` },
                   { icon: <BsBookmark />, label: "Add to Bookmarks" },
                   { icon: <AiOutlineShareAlt />, label: "Share post via…" },
                 ].map((item) => (
@@ -180,7 +179,7 @@ export function FeedCard(props: FeedCardProps) {
         </div>
 
         {/* Reply-to tag */}
-        {replyTo && (
+        {/* {replyTo && (
           <p className="text-[13px] text-gray-500 mt-0.5 mb-1">
             Replying to{" "}
             <span className="text-[#1d9bf0] hover:underline cursor-pointer">
@@ -188,7 +187,7 @@ export function FeedCard(props: FeedCardProps) {
             </span>
           </p>
 
-        )}
+        )} */}
 
         {/* Tweet text */}
         <p className="text-white text-[15px] leading-relaxed mt-0.5 whitespace-pre-wrap break-words">
@@ -196,10 +195,10 @@ export function FeedCard(props: FeedCardProps) {
         </p>
 
         {/* Optional image */}
-        {image && (
+        {data.imageUrl && (
           <div className="mt-3 rounded-2xl overflow-hidden border border-gray-700/60 max-h-80">
             <img
-              src={image}
+              src={data.imageUrl}
               alt="tweet media"
               className="w-full h-full object-cover"
             />
@@ -212,7 +211,7 @@ export function FeedCard(props: FeedCardProps) {
           {/* Reply */}
           <ActionBtn
             icon={<AiOutlineComment className="text-lg" />}
-            count={stats?.replies}
+            // count={stats?.replies}
             activeColor="text-[#1d9bf0]"
             hoverBg="bg-[#1d9bf0]/10"
             label="Reply"
@@ -221,7 +220,7 @@ export function FeedCard(props: FeedCardProps) {
           {/* Retweet */}
           <ActionBtn
             icon={<AiOutlineRetweet className="text-lg" />}
-            count={stats?.retweets}
+            // count={stats?.retweets}
             activeColor="text-green-400"
             hoverBg="bg-green-400/10"
             label="Retweet"
@@ -231,7 +230,7 @@ export function FeedCard(props: FeedCardProps) {
           <ActionBtn
             icon={<AiOutlineHeart className="text-lg" />}
             activeIcon={<AiFillHeart className="text-lg" />}
-            count={stats?.likes}
+            // count={stats?.likes}
             activeColor="text-pink-500"
             hoverBg="bg-pink-500/10"
             label="Like"
@@ -240,7 +239,7 @@ export function FeedCard(props: FeedCardProps) {
           {/* Views */}
           <ActionBtn
             icon={<AiOutlineBarChart className="text-lg" />}
-            count={stats?.views}
+            // count={stats?.views}
             activeColor="text-[#1d9bf0]"
             hoverBg="bg-[#1d9bf0]/10"
             label="Views"
@@ -311,8 +310,8 @@ const DEMO_TWEETS: FeedCardProps[] = [
 ];
 
 export default function FeedCardDemo(props: FeedCardProps) {
-  const {data} = props;
-  console.log("data", props)
+  // const {data} = props;
+  // console.log("data-->", props)
   return (
     <div className="min-h-screen bg-black ">
       <div className="max-w-[800px] mx-auto border-x border-gray-800 min-h-screen">

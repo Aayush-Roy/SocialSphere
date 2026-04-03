@@ -1,4 +1,7 @@
-import React, { useState, useRef } from "react";
+import { useCreateTweet } from "@/hooks/tweet";
+import { Tweet } from "@/src/gql/graphql";
+import { Content } from "next/font/google";
+import React, { useState, useRef, useCallback } from "react";
 import {
   AiOutlineFileImage,
   AiOutlineSmile,
@@ -15,12 +18,13 @@ interface CreatePostCardProps {
 }
 
 export interface PostData {
-  text: string;
-  images: File[];
-  poll?: {
-    question: string;
-    options: string[];
-  };
+  // text: string;
+  // images: File[];
+  // poll?: {
+  //   question: string;
+  //   options: string[];
+  // };
+  data:Tweet
 }
 
 const CreatePostCard: React.FC<CreatePostCardProps> = ({
@@ -28,13 +32,14 @@ const CreatePostCard: React.FC<CreatePostCardProps> = ({
   userName = "You",
   onPostCreate,
 }) => {
-  const [postText, setPostText] = useState("");
+  // const [postText, setPostText] = useState("");
+  const[content,setContent] = useState("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPosting, setIsPosting] = useState(false);
-
+  const{mutate}=useCreateTweet()
   const emojis = ["😀", "😂", "😍", "🔥", "✨", "👍", "💯", "🎉", "🚀", "💯"];
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,41 +72,95 @@ const CreatePostCard: React.FC<CreatePostCardProps> = ({
   };
 
   const addEmoji = (emoji: string) => {
-    setPostText((prev) => prev + emoji);
+    // setPostText((prev) => prev + emoji);
+    setContent((prev) => prev + emoji);
   };
 
-  const handlePost = async () => {
-    if (!postText.trim() && selectedImages.length === 0) {
-      toast.error("Post cannot be empty");
-      return;
+  // const handlePost = async () => {
+  //   if (!postText.trim() && selectedImages.length === 0) {
+  //     toast.error("Post cannot be empty");
+  //     return;
+  //   }
+
+  //   setIsPosting(true);
+
+  //   try {
+  //     // Simulate API call delay
+  //     const postData: PostData = {
+  //       text: postText,
+  //       images: selectedImages,
+  //     };
+
+  //     // Call parent callback if provided
+  //     if (onPostCreate) {
+  //       await onPostCreate(postData);
+  //     }
+
+  //     // Clear form
+  //     setPostText("");
+  //     setSelectedImages([]);
+  //     setImagePreviews([]);
+  //     toast.success("Post created successfully");
+  //   } catch (error) {
+  //     toast.error("Failed to create post");
+  //   } finally {
+  //     setIsPosting(false);
+  //   }
+  // };
+
+// const handlePost = useCallback(() => {
+
+//   if (!postText.trim()) {
+//     toast.error("Tweet cannot be empty");
+//     return;
+//   }
+
+//   mutate(
+//     {
+//       content: postText
+//     },
+//     {
+//       onSuccess: () => {
+//         setPostText("");
+//         toast.success("Tweet posted 🚀");
+//       },
+//       onError: (err) => {
+//         console.log(err);
+//         toast.error("Tweet failed");
+//       },
+//     }
+//   );
+
+// }, [postText, mutate]);
+const handlePost = useCallback(() => {
+
+  if (!content.trim()) {
+    toast.error("Tweet cannot be empty");
+    return;
+  }
+
+  setIsPosting(true);
+
+  mutate(
+    {
+      content
+    },
+    {
+      onSuccess: () => {
+        // setPostText("");
+        setContent("")
+        setIsPosting(false);
+        toast.success("Tweet posted 🚀");
+      },
+      onError: (err) => {
+        console.log(err);
+        setIsPosting(false);
+        toast.error("Tweet failed");
+      },
     }
+  );
 
-    setIsPosting(true);
-
-    try {
-      // Simulate API call delay
-      const postData: PostData = {
-        text: postText,
-        images: selectedImages,
-      };
-
-      // Call parent callback if provided
-      if (onPostCreate) {
-        await onPostCreate(postData);
-      }
-
-      // Clear form
-      setPostText("");
-      setSelectedImages([]);
-      setImagePreviews([]);
-      toast.success("Post created successfully");
-    } catch (error) {
-      toast.error("Failed to create post");
-    } finally {
-      setIsPosting(false);
-    }
-  };
-
+}, [content, mutate]);
   return (
     <div className="border-b border-gray-700 p-4 hover:bg-gray-900/50 transition">
       <div className="flex gap-4">
@@ -118,8 +177,9 @@ const CreatePostCard: React.FC<CreatePostCardProps> = ({
         <div className="flex-1">
           {/* Text Input */}
           <textarea
-            value={postText}
-            onChange={(e) => setPostText(e.target.value)}
+            value={content}
+            // onChange={(e) => setPostText(e.target.value)}
+            onChange={(e) => setContent(e.target.value)}
             placeholder="What's happening!?"
             className="w-full bg-transparent text-2xl text-white placeholder-gray-500 outline-none resize-none"
             rows={3}
@@ -188,7 +248,8 @@ const CreatePostCard: React.FC<CreatePostCardProps> = ({
             <button
               onClick={handlePost}
               disabled={
-                isPosting || (!postText.trim() && selectedImages.length === 0)
+                // isPosting || (!postText.trim() && selectedImages.length === 0)
+                isPosting || (!content.trim() && selectedImages.length === 0)
               }
               className="bg-blue-500 text-white px-6 py-2 rounded-full font-bold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >

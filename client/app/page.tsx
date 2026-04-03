@@ -275,7 +275,10 @@ profileImageUrl
         )}
         {/* Placeholder tweets */}
         {/* {tweets?.map(tweet=><FeedCardDemo key={tweet?.id} data={tweet} />)} */}
-        <FeedCardDemo />
+        {/* <FeedCardDemo data={tweets} /> */}
+        {tweets?.map((tweet)=>(
+    <FeedCard key={tweet.id} data={tweet}/>
+  ))}
       </div>
 
       {/* Right Panel */}
