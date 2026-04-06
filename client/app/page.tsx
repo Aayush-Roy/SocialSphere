@@ -20,7 +20,8 @@ import { graphql } from "@/src/gql";
 import { GraphQLClient } from "graphql-request";
 import { graphqlClient } from "@/gqlClients/api";
 import {  verifyGoogleToken } from "@/graphql/query/user";
-import { useCurrentUser } from "@/hooks/user";
+
+import { useCurrentUser, useGetSuggestedUsers } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import CreatePostCard from "@/components/CreatePostCard";
 import { useGetAllTweets } from "@/hooks/tweet";
@@ -183,8 +184,9 @@ export default function Home() {
   const { user, isLoading } = useCurrentUser();
   const queryClient = useQueryClient();
   const {tweets=[]} = useGetAllTweets();
-  console.log("tweets->", tweets);
-  console.log("currUser->",user);
+  const { users: suggestedUsers = [] } = useGetSuggestedUsers();
+  // console.log("tweets->", tweets);
+  console.log("sugges->",suggestedUsers);
 
   const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
   const googleToken = cred.credential;
@@ -252,9 +254,62 @@ profileImageUrl
         <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-800">
           <AiOutlineSearch className="text-gray-500 text-lg" />
           <span className="text-gray-500 text-sm">Search</span>
-          {!user && <GoogleLogin onSuccess={handleLoginWithGoogle}/>}
           
         </div>
+        {!user && <GoogleLogin onSuccess={handleLoginWithGoogle}/>}
+           <div className="hidden md:block md:col-span-3 px-6 py-2">
+                    {!user ? (
+                      /* Show Login if not logged in */
+                     <div></div>
+                    ) : (
+                      /* ✅ SHOW SUGGESTED USERS IF LOGGED IN */
+                      <div className="space-y-4 sticky top-2">
+                        <div className="bg-[#16181c] rounded-2xl p-4">
+                          <h2 className="text-xl font-extrabold mb-4">Who to follow</h2>
+                          <div className="space-y-4">
+                            {suggestedUsers?.map((user: any) => (
+                              <div key={user.id} className="flex items-center justify-between gap-2">
+                                <div className="flex gap-2 items-center">
+                                  {user.profileImageUrl && (
+                                    <Image
+                                      src={user.profileImageUrl}
+                                      alt="user-image"
+                                      className="rounded-full"
+                                      width={40}
+                                      height={40}
+                                    />
+                                  )}
+                                  <div className="flex flex-col">
+                                    <p className="text-sm font-bold truncate max-w-[100px]">
+                                      {user.firstName} {user.lastName}
+                                    </p>
+                                    <p className="text-xs text-gray-500">@{user.firstName.toLowerCase()}</p>
+                                  </div>
+                                </div>
+                                <Link 
+                                  href={`/profile/${user.id}`} 
+                                  className="bg-white text-black text-xs font-bold px-4 py-1.5 rounded-full hover:bg-gray-200"
+                                >
+                                  View
+                                </Link>
+                              </div>
+                            ))}
+                          </div>
+                          <button className="text-blue-500 text-sm mt-4 hover:underline">Show more</button>
+                        </div>
+          
+                        {/* Trending Box */}
+                        <div className="bg-[#16181c] rounded-2xl p-4">
+                          <h2 className="text-xl font-extrabold mb-4">What's happening</h2>
+                          <div className="text-sm">
+                            <p className="text-gray-500 text-xs">Trending in India</p>
+                            <p className="font-bold">#NextJS2026</p>
+                            <p className="text-gray-500 text-xs">12.5K posts</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
       </div>
     </div>
   );

@@ -413,7 +413,7 @@ function ActionBtn({
 // ─── Feed Card ────────────────────────────────────────────────────────────────
 
 export function FeedCard({ data }: FeedCardProps) {
-  console.log("feed->", data);
+  // console.log("feed->", data);
   const router = useRouter();
   const [bookmarked, setBookmarked] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

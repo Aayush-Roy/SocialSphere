@@ -1,18 +1,14 @@
-export const queries=`#graphql
+// export const queries=`#graphql
 
-    verifyGoogleToken(token:String!):String
-    getCurrentUser:User
+//     verifyGoogleToken(token:String!):String
+//     getCurrentUser:User
 
-`
+// `
+export const queries = `#graphql
 
-export const getCurrentUserQuery = `#graphql
-
-    getCurrentUser {
-    id
-    profileImageUrl
-    email
-    firstName
-    lastName
-  }
-
+    verifyGoogleToken(token: String!): String
+    getCurrentUser: User
+    getUser(id: ID!): User
+    # getUserById(id: ID!): User
+    suggestedUsers: [User!]!
 `

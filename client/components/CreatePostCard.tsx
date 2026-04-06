@@ -18,12 +18,6 @@ interface CreatePostCardProps {
 }
 
 export interface PostData {
-  // text: string;
-  // images: File[];
-  // poll?: {
-  //   question: string;
-  //   options: string[];
-  // };
   data:Tweet
 }
 
@@ -40,6 +34,89 @@ const CreatePostCard: React.FC<CreatePostCardProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPosting, setIsPosting] = useState(false);
   const{mutate}=useCreateTweet()
+  const uploadImage = async (file: File): Promise<string> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    // ✅ Check if response is ok
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Upload failed");
+    }
+
+    const data = await res.json();
+
+    // ✅ Check if URL exists
+    if (!data.url) {
+      throw new Error("No URL returned from server");
+    }
+
+    return data.url;
+  } catch (error) {
+    console.error("Image upload error:", error);
+    throw error; // Re-throw to be caught by handlePost
+  }
+};
+
+const handlePost = useCallback(async () => {
+  if (!content.trim() && selectedImages.length === 0) {
+    toast.error("Tweet cannot be empty");
+    return;
+  }
+
+  setIsPosting(true);
+
+  try {
+    let imageUrl = "";
+
+    // Upload image with proper error handling
+    if (selectedImages.length > 0) {
+      try {
+        imageUrl = await uploadImage(selectedImages[0]);
+        console.log("Image uploaded:", imageUrl); // Debug
+      } catch (uploadError) {
+        setIsPosting(false);
+        toast.error("Image upload failed");
+        return; // Stop here
+      }
+    }
+
+    // Only mutate if upload succeeded
+    mutate(
+      {
+        content,
+        imageUrl: imageUrl || undefined, // Send undefined if no image
+      },
+      {
+        onSuccess: () => {
+          setContent("");
+          setSelectedImages([]);
+          setImagePreviews([]);
+          setIsPosting(false);
+          toast.success("Tweet posted 🚀");
+        },
+        onError: (err) => {
+          console.error("Mutation error:", err);
+          setIsPosting(false);
+          toast.error("Failed to post tweet");
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    setIsPosting(false);
+    toast.error("Something went wrong");
+  }
+}, [content, selectedImages, mutate]);
   const emojis = ["😀", "😂", "😍", "🔥", "✨", "👍", "💯", "🎉", "🚀", "💯"];
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,91 +153,167 @@ const CreatePostCard: React.FC<CreatePostCardProps> = ({
     setContent((prev) => prev + emoji);
   };
 
-  // const handlePost = async () => {
-  //   if (!postText.trim() && selectedImages.length === 0) {
-  //     toast.error("Post cannot be empty");
-  //     return;
-  //   }
 
-  //   setIsPosting(true);
-
-  //   try {
-  //     // Simulate API call delay
-  //     const postData: PostData = {
-  //       text: postText,
-  //       images: selectedImages,
-  //     };
-
-  //     // Call parent callback if provided
-  //     if (onPostCreate) {
-  //       await onPostCreate(postData);
-  //     }
-
-  //     // Clear form
-  //     setPostText("");
-  //     setSelectedImages([]);
-  //     setImagePreviews([]);
-  //     toast.success("Post created successfully");
-  //   } catch (error) {
-  //     toast.error("Failed to create post");
-  //   } finally {
-  //     setIsPosting(false);
-  //   }
-  // };
 
 // const handlePost = useCallback(() => {
-
-//   if (!postText.trim()) {
+//   if (!content.trim()) {
 //     toast.error("Tweet cannot be empty");
 //     return;
 //   }
 
+//   setIsPosting(true);
+
 //   mutate(
 //     {
-//       content: postText
+//       content
 //     },
 //     {
 //       onSuccess: () => {
-//         setPostText("");
+//         // setPostText("");
+//         setContent("")
+//         setIsPosting(false);
 //         toast.success("Tweet posted 🚀");
 //       },
 //       onError: (err) => {
 //         console.log(err);
+//         setIsPosting(false);
 //         toast.error("Tweet failed");
 //       },
 //     }
 //   );
 
-// }, [postText, mutate]);
-const handlePost = useCallback(() => {
+// }, [content, mutate]);
+// const handlePost = useCallback(async () => {
 
-  if (!content.trim()) {
-    toast.error("Tweet cannot be empty");
-    return;
-  }
+//   if (!content.trim() && selectedImages.length === 0) {
 
-  setIsPosting(true);
+//     toast.error("Tweet cannot be empty");
 
-  mutate(
-    {
-      content
-    },
-    {
-      onSuccess: () => {
-        // setPostText("");
-        setContent("")
-        setIsPosting(false);
-        toast.success("Tweet posted 🚀");
-      },
-      onError: (err) => {
-        console.log(err);
-        setIsPosting(false);
-        toast.error("Tweet failed");
-      },
-    }
-  );
+//     return;
 
-}, [content, mutate]);
+//   }
+
+//   try {
+
+//     setIsPosting(true);
+
+//     let imageUrl = "";
+
+//     // agar image select ki hai to upload karo
+//     if (selectedImages.length > 0) {
+
+//       imageUrl = await uploadImage(selectedImages[0]);
+
+//     }
+
+//     mutate(
+
+//       {
+       
+
+//           content,
+//           imageUrl
+
+        
+
+//       },
+
+//       {
+
+//         onSuccess: () => {
+
+//           setContent("");
+
+//           setSelectedImages([]);
+
+//           setImagePreviews([]);
+
+//           setIsPosting(false);
+
+//           toast.success("Tweet posted 🚀");
+
+//         },
+
+//         onError: (err) => {
+
+//           console.log(err);
+
+//           setIsPosting(false);
+
+//           toast.error("Tweet failed");
+
+//         },
+
+//       }
+
+//     );
+
+//   } catch (error) {
+
+//     console.log(error);
+
+//     setIsPosting(false);
+
+//     toast.error("Image upload failed");
+
+//   }
+
+// }, [content, selectedImages, mutate]);
+// const handlePost = useCallback(async () => {
+//   if (!content.trim() && selectedImages.length === 0) {
+//     toast.error("Tweet cannot be empty");
+//     return;
+//   }
+
+//   setIsPosting(true);
+
+//   try {
+//     // Step 1: Upload all images in parallel
+//     let imageUrls: string[] = [];
+//     if (selectedImages.length > 0) {
+//       try {
+//         imageUrls = await Promise.all(
+//           selectedImages.map((file) => uploadImage(file))
+//         );
+//       } catch (uploadError) {
+//         console.error("Upload failed:", uploadError);
+//         setIsPosting(false);
+//         toast.error("Image upload failed. Please try again.");
+//         return; // ❌ Stop here, don't create tweet without images
+//       }
+//     }
+
+//     // Step 2: Create tweet (only if upload succeeded)
+//     return new Promise((resolve) => {
+//       mutate(
+//         {
+//           content: content.trim(),
+//           imageUrl: imageUrls[0] || undefined, // Only send if exists
+//         },
+//         {
+//           onSuccess: () => {
+//             setContent("");
+//             setSelectedImages([]);
+//             setImagePreviews([]);
+//             setIsPosting(false);
+//             toast.success("Tweet posted 🚀");
+//             resolve(true);
+//           },
+//           onError: (err) => {
+//             console.error("Tweet creation failed:", err);
+//             setIsPosting(false);
+//             toast.error("Failed to post tweet");
+//             resolve(false);
+//           },
+//         }
+//       );
+//     });
+//   } catch (error) {
+//     console.error("Unexpected error:", error);
+//     setIsPosting(false);
+//     toast.error("Something went wrong");
+//   }
+// }, [content, selectedImages, mutate]);
   return (
     <div className="border-b border-gray-700 p-4 hover:bg-gray-900/50 transition">
       <div className="flex gap-4">
