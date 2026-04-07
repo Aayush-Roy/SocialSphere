@@ -81,7 +81,9 @@ export async function initServer(): Promise<express.Express> {
     const app = express();
     app.use(
         cors({
-            origin: "http://localhost:3000",
+            origin: ["http://localhost:3000",
+                "https://social-sphere-5q8e.vercel.app",
+            ],
             credentials: true,
         })
     );
