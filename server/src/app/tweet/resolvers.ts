@@ -1,26 +1,30 @@
 import { prisma } from "../../prismaClient";
 import { GraphqlContext } from "../../interfaces";
 import { Tweet } from "@prisma/client";
+import { redisClient } from "../../redis";
 
 interface CreateTweetPayLoad{
     content:string;
     imageUrl?:string;
 }
-// const queries = {
-//     getAllTweets:()=>{
-//         prisma.tweet.findMany({orderBy:{createdAt:"desc"}})
-//     }
-// }
+
 const queries = {
     getAllTweets: async () => {
-        return await prisma.tweet.findMany({
+        const cachedTweets=await redisClient.get("ALL-TWEETS")
+        if(cachedTweets) return JSON.parse(cachedTweets)
+        const tweets = await prisma.tweet.findMany({
             orderBy: { createdAt: "desc" }
         });
+        await redisClient.set(`ALL-TWEETS`,JSON.stringify(tweets));
+        return tweets;
     }
 };
 const mutations ={
     createTweet:async(parent:any,{payload}:{payload:CreateTweetPayLoad},ctx:GraphqlContext)=>{
+       
         if(!ctx.user) throw new Error("you are not authenticated")
+        const rateLimitingFlag = await redisClient.get(`RATE-LIMIT:TWEET:${ctx.user.id}`)
+        if(rateLimitingFlag) throw new Error("Please wait...")
         const tweet = await prisma.tweet.create({
             data:{
                 content:payload.content,
@@ -28,6 +32,8 @@ const mutations ={
                 author:{connect:{id:ctx.user.id}}
             }
         })
+        await redisClient.setex(`RATE-LIMIT:TWEET:${ctx.user.id}`,10,1)
+        await redisClient.del("ALL-TWEETS");
         return tweet;
     }
 }
