@@ -387,6 +387,7 @@ import { prisma } from "../../prismaClient";
 import JWTService from "../services/jwt";
 import { GraphqlContext } from "../../interfaces";
 import { Tweet, User } from "@prisma/client";
+import { redisClient } from "../../redis";
 
 interface GoogleTokenInfo {
   iss?: string;
@@ -464,6 +465,8 @@ const queries = {
   // },
   suggestedUsers: async (parent: any, args: any, ctx: GraphqlContext) => {
   const currentUserId = ctx.user?.id;
+  const cachedValue = await redisClient.get(`RECOMMENDED_USERS:${ctx.user?.id}`)
+  if(cachedValue) return JSON.parse(cachedValue);
   if (!currentUserId) throw new Error("User not authenticated!");
 
   const users = await prisma.user.findMany({
@@ -483,7 +486,7 @@ const queries = {
     },
     take: 10
   });
-
+  await redisClient.set(`RECOMMENDED_USERS:${ctx.user?.id}`,JSON.stringify(users));
   return users;
 },
   getUser: async (parent: any, { id }: { id: string }, ctx: GraphqlContext) => {
@@ -552,6 +555,8 @@ const mutations = {
       }
     })
 
+    await redisClient.del(`RECOMMENDED_USERS:${ctx.user?.id}`)
+
     const user = await prisma.user.findUnique({
       where: { id: followingId }
     })
@@ -595,6 +600,8 @@ const mutations = {
         }
       }
     })
+
+    await redisClient.del(`RECOMMENDED_USERS:${ctx.user?.id}`)
 
     const user = await prisma.user.findUnique({
       where: { id: followingId }
