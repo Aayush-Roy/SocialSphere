@@ -333,44 +333,85 @@ const queries = {
     return user;
   },
 
+  // suggestedUsers: async (parent: any, args: any, ctx: GraphqlContext) => {
+  //   const currentUserId = ctx.user?.id;
+  //   if (!currentUserId) throw new Error("User not authenticated!");
+
+  //   // ⚡ OPTIMIZATION: Added TTL to cache (5 minutes)
+  //   const cacheKey = `RECOMMENDED_USERS:${currentUserId}`;
+  //   const cachedValue = await redisClient.get(cacheKey);
+  //   if (cachedValue) return JSON.parse(cachedValue);
+
+  //   const users = await prisma.user.findMany({
+  //     where: {
+  //       AND: [
+  //         { id: { not: currentUserId } },
+  //         {
+  //           following: {
+  //             none: {
+  //               followerId: currentUserId
+  //             }
+  //           }
+  //         }
+  //       ]
+  //     },
+  //     take: 10,
+  //     // ⚡ OPTIMIZATION: Select only needed fields
+  //     select: {
+  //       id: true,
+  //       email: true,
+  //       firstName: true,
+  //       lastName: true,
+  //       profileImageUrl: true
+  //     }
+  //   });
+
+  //   // Cache for 5 minutes
+  //   await redisClient.setex(cacheKey, 300, JSON.stringify(users));
+  //   return users;
+  // },
+
   suggestedUsers: async (parent: any, args: any, ctx: GraphqlContext) => {
-    const currentUserId = ctx.user?.id;
-    if (!currentUserId) throw new Error("User not authenticated!");
+  const currentUserId = ctx.user?.id;
+  if (!currentUserId) throw new Error("User not authenticated!");
 
-    // ⚡ OPTIMIZATION: Added TTL to cache (5 minutes)
-    const cacheKey = `RECOMMENDED_USERS:${currentUserId}`;
-    const cachedValue = await redisClient.get(cacheKey);
-    if (cachedValue) return JSON.parse(cachedValue);
+  const cacheKey = `RECOMMENDED_USERS:${currentUserId}`;
 
-    const users = await prisma.user.findMany({
-      where: {
-        AND: [
-          { id: { not: currentUserId } },
-          {
-            following: {
-              none: {
-                followerId: currentUserId
-              }
-            }
+  // ⚡ 1. Try cache first (fastest)
+  const cachedValue = await redisClient.get(cacheKey);
+  if (cachedValue) return JSON.parse(cachedValue);
+
+  // ⚡ 2. Optimized DB query
+  const users = await prisma.user.findMany({
+    where: {
+      id: { not: currentUserId },
+
+      // faster than nested AND array
+      NOT: {
+        followers: {
+          some: {
+            followerId: currentUserId
           }
-        ]
-      },
-      take: 10,
-      // ⚡ OPTIMIZATION: Select only needed fields
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        profileImageUrl: true
+        }
       }
-    });
+    },
 
-    // Cache for 5 minutes
-    await redisClient.setex(cacheKey, 300, JSON.stringify(users));
-    return users;
-  },
+    take: 10,
 
+    // ⚡ minimal fields only
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      profileImageUrl: true
+    }
+  });
+
+  // ⚡ 3. cache with expiry
+  await redisClient.set(cacheKey, JSON.stringify(users), "EX", 300);
+
+  return users;
+},
   getUser: async (parent: any, { id }: { id: string }, ctx: GraphqlContext) => {
     // ⚡ OPTIMIZATION: Check cache first
     const cacheKey = `USER:${id}`;

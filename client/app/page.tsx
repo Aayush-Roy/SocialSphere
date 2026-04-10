@@ -1177,7 +1177,7 @@ export default function Home() {
         <aside className="hidden lg:block lg:col-span-3 px-6 py-4 space-y-6 sticky top-0 h-screen overflow-y-auto">
           <div className="flex items-center gap-3 bg-zinc-900/80 border border-zinc-800/50 rounded-2xl px-4 py-3 focus-within:border-indigo-500/50 transition-all">
             <AiOutlineSearch className="text-zinc-500" />
-            <input type="text" placeholder="Search Pulse" className="bg-transparent border-none outline-none text-sm w-full" />
+            <input type="text" placeholder="Search" className="bg-transparent border-none outline-none text-sm w-full" />
           </div>
 
           {!user ? (

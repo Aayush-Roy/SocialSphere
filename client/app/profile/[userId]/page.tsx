@@ -338,7 +338,13 @@ export default function ProfilePage() {
 
   const isFollowingUser = profileUser?.isFollowing ?? false;
   const isOwnProfile = currentUser?.id === userId;
+  const logout = () => {
 
+  localStorage.removeItem("token");
+
+  window.location.href = "/";
+
+};
   const handleFollowClick = async () => {
     if (!currentUser) {
       setError("Please login first!");
@@ -414,9 +420,24 @@ export default function ProfilePage() {
                 {/* Action Button */}
                 <div className="mt-16">
                   {isOwnProfile ? (
-                    <button className="px-5 py-2 border border-zinc-700 rounded-xl font-semibold text-sm hover:bg-zinc-800 transition-all active:scale-95">
-                      Edit Profile
-                    </button>
+                    <div className="flex gap-2">
+    
+    <button className="px-5 py-2 border border-zinc-700 rounded-xl font-semibold text-sm hover:bg-zinc-800 transition-all active:scale-95">
+      Edit Profile
+    </button>
+
+    <button
+      onClick={logout}
+      className="px-5 py-2 border border-red-800 text-red-400 rounded-xl font-semibold text-sm hover:bg-red-950/40 transition-all active:scale-95"
+    >
+      Logout
+    </button>
+
+  </div> 
+                    // <button className="px-5 py-2 border border-zinc-700 rounded-xl font-semibold text-sm hover:bg-zinc-800 transition-all active:scale-95">
+                    //   Edit Profile
+                    // </button>
+                    
                   ) : (
                     <div className="flex flex-col items-end gap-2">
                       <button 

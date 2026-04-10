@@ -661,6 +661,8 @@ function ActionBtn({
     });
   };
 
+
+
   return (
     <button
       onClick={toggle}
@@ -690,7 +692,28 @@ export function FeedCard({ data }: FeedCardProps) {
   const router = useRouter();
   const [bookmarked, setBookmarked] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const handleShare = async (e?: React.MouseEvent) => {
+  e?.stopPropagation();
 
+  const shareUrl = `${window.location.origin}/tweet/${data.id}`;
+
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: `${data.author?.firstName}'s post`,
+        text: data.content,
+        url: shareUrl,
+      });
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Link copied to clipboard");
+    }
+  } catch (error) {
+    console.log("Share failed:", error);
+  }
+
+  setMenuOpen(false);
+};
   if (!data) return null;
 
   return (
@@ -748,7 +771,7 @@ export function FeedCard({ data }: FeedCardProps) {
               <BsThreeDots size={18} />
             </button>
 
-            {menuOpen && (
+            {/* {menuOpen && (
               <div
                 className="absolute right-0 top-10 z-50 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl w-56 py-2 overflow-hidden animate-in fade-in zoom-in duration-200"
                 onClick={(e) => e.stopPropagation()}
@@ -768,7 +791,21 @@ export function FeedCard({ data }: FeedCardProps) {
                   Share Post
                 </button>
               </div>
-            )}
+            )} */}
+            {menuOpen && (
+  <div
+    className="absolute right-0 top-10 z-50 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl w-56 py-2 overflow-hidden animate-in fade-in zoom-in duration-200"
+    onClick={(e) => e.stopPropagation()}
+  >
+    <button
+      onClick={handleShare}
+      className="flex items-center gap-3 w-full px-4 py-3 text-zinc-200 text-sm font-medium hover:bg-white/10 transition-colors"
+    >
+      <AiOutlineShareAlt size={18} />
+      Share Post
+    </button>
+  </div>
+)}
           </div>
         </div>
 
