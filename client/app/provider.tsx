@@ -31,7 +31,7 @@ import { Toaster } from "react-hot-toast";
 export default function Providers({ children }: { children: React.ReactNode }) {
 
   const [queryClient] = useState(() => new QueryClient());
-
+// 598712780231-hs2ekjg5672jjgm2l76i5s49mcplhfnj.apps.googleusercontent.com
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleOAuthProvider clientId="598712780231-hs2ekjg5672jjgm2l76i5s49mcplhfnj.apps.googleusercontent.com">
