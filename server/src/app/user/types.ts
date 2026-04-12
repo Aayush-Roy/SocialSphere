@@ -37,4 +37,5 @@ export const types = `#graphql
         message: String!
         user: User!
     }
+    
 `

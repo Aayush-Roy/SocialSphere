@@ -5,7 +5,7 @@ import { JWTUser } from "../../interfaces";
 const JWT_SECRET="$jhystr782364ruwei"
 class JWTService{
     public static  generateTokenForUser(user:User){
-        // const user = await prisma.user.findUnique({where:{id:userId}})
+  
         const payload:JWTUser = {
             id:user?.id,
             email:user?.email
